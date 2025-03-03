@@ -12,7 +12,12 @@ Perlでのコーディングにおけるプラクティス
 - 純粋関数を優先する
 - 例外よりもエラーを返す
 
-## 基本的なコーディングスタイル
+## 環境
+
+- miseでインストールしたperlを利用する
+- 作業ディレクトリに「perl 5.40.0」と書いた.tool-versionsファイルを作成し、mise activateを行ってからスクリプトを実行する
+
+## コーディングスタイル
 
 - プラグマは、v5.40を利用する
 - utf8を利用する
@@ -72,6 +77,19 @@ subtest 'add' => sub {
 done_testing;
 ```
 
+- テストのmatcherは、`is` を利用する
+- `like`, `unlike` は用いず、`match` を利用する
+
+```perl
+sub hello($name) { return "Hello, $name!" }
+
+# Good
+is hello('bar'), match qr/^Hello, /, 'say hello to bar';
+
+# Bad
+like hello('bar'), qr/^Hello, /, 'say hello to bar';
+```
+
 ## 値の型制約を宣言する
 
 - `Types::Standard` と `kura` を利用して型制約を宣言する
@@ -106,7 +124,7 @@ assert( UserData->check($data) );
 
 ## エラー処理
 
-1. エラーメッセージを持つエラークラスを継承した子クラスをエラーケースごとに用意する
+1. 想定しているエラーは、エラーメッセージを持つエラークラスを継承した子クラスをエラーケースごとに用意する
 
 ```perl
 use v5.40;
@@ -156,4 +174,45 @@ if ($err isa ErrorInvalidUserName) {
 
 say "Hello, @{[$user->name]}!";
 ```
+
+3. 想定外のエラーは、組み込みのtry/catchを利用し、Result::Simpleでエラーを返す。Try::Tinyは使わない
+
+```perl
+use v5.40;
+
+use Result::Simple;
+
+sub foo {
+    try {
+        die 'Unexpected error';
+    }
+    catch($e) {
+        return Err(ErrorUnexpected(message => $e));
+    }
+}
+```
+
+## 関数のエクスポート
+
+- 純粋関数は、Exporterを利用してエクスポートする
+- `@EXPORT_OK` にエクスポートする関数を列挙する
+
+```perl
+package MyModule;
+use v5.40;
+use utf8;
+
+use Exporter 'import';
+
+our @EXPORT_OK = qw(add);
+
+sub add($x, $y) {
+    return $x + $y;
+}
+```
+
+## 依存モジュールの管理
+
+- `cpanfile` で依存モジュールを管理し、バージョンを指定する
+- `Carmel` でインストールをする
 
