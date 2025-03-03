@@ -14,8 +14,9 @@ Perlでのコーディングにおけるプラクティス
 
 ## 環境
 
-- miseでインストールしたperlを利用する
-- 作業ディレクトリに「perl 5.40.0」と書いた.tool-versionsファイルを作成し、mise activateを行ってからスクリプトを実行する
+- miseでインストールしたperlを利用する。システムのperlを絶対に利用しない
+- 作業ディレクトリに「perl 5.40.0」と書いた.tool-versionsファイルを作成する
+- `eval "$(mise activate bash)" && perl -v` のようにmise activateを行ってからスクリプトを実行する
 
 ## コーディングスタイル
 
