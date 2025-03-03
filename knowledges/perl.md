@@ -7,7 +7,7 @@ Perlでのコーディングにおけるプラクティス
 - 最新のモダンPerlを利用する
 - 値の型制約を宣言する
 - パッケージに、NAME,SYNOPSIS,DESCRIPTIONを記載する
-- 関数の冒頭に、その関数が何をするかを最低限コメントする
+- 関数の冒頭に、その関数が何をするかをコメントする
 - アダプタパターンで副作用を抽象化する
 - 純粋関数を優先する
 - 例外よりもエラーを返す
@@ -49,14 +49,12 @@ sub add {
 1;
 ```
 
-## テストの書き方
+## テスト
 
 - ユニットテストは、`Test2::V0` を利用する
-- テストの説明は、"前提となる状況"、"実行する操作"、"期待する結果"を書く
-- 何をテストしたいのか明確にする
-  - Bad: 前提となる状況をセットアップするのに数十行のコードが必要
-  - Good: セットアップ関数にまとめる
-  - Good: テーブルテストを用いる
+- `subtest 'DESCRIPTION' => sub { ... }` の `DESCRIPTION` には、"前提となる状況"、"実行する操作"、"期待する結果"を書く
+- テーブルテストを書く際は、次のコードのようにMultiple-alias syntax for foreach を利用する
+  - `while (my ($x, $y, $expected) = splice(@cases, 0, 3)) { ... }` は*使わない*
 
 ```perl
 use v5.40;
@@ -79,16 +77,23 @@ done_testing;
 ```
 
 - テストのmatcherは、`is` を利用する
-- `like`, `unlike` は用いず、`match` を利用する
+- `like`, `unlike` は用いない。代わりに`match` を利用する
 
 ```perl
-sub hello($name) { return "Hello, $name!" }
+sub bye($name) { die "Bye, $name!" }
 
 # Good
-is hello('bar'), match qr/^Hello, /, 'say hello to bar';
+is dies { bye('foo') }, match qr/^Bye, foo!/, 'say bye to foo';
 
 # Bad
-like hello('bar'), qr/^Hello, /, 'say hello to bar';
+like dies { bye('foo') }, qr/^Bye, foo!/, 'say bye to foo';
+```
+
+- テストは、`prove` で実行する
+- テストファイルに `use lib 'lib'` の指定は不要
+
+```sh
+prove -lvr t/path/to/test.t
 ```
 
 ## 値の型制約を宣言する
@@ -114,14 +119,33 @@ use Types::Standard -types;
 use kura Data => HashRef;
 ```
 
-- `Syntax::Keyword::Assert` を利用して、値のチェックを行う
+- `Syntax::Keyword::Assert` の assert キーワードを利用して、値のチェックを行う
+  - unless ... croak は使わない
 
 ```perl
 use Syntax::Keyword::Assert;
+use kura PositiveInt => Int & sub { $_ > 0 };
 
-assert( UserData->check($data) );
+# Good
+sub add($x, $y) {
+    assert( PositiveInt->check($x) );
+    assert( PositiveInt->check($y) );
+
+    return $x + $y;
+}
+
+# Bad
+sub add($x, $y) {
+    unless ( PositiveInt->check($x) ) {
+        croak 'x is not a positive integer';
+    }
+    unless ( PositiveInt->check($y) ) {
+        croak 'y is not a positive integer';
+    }
+
+    return $x + $y;
+}
 ```
-
 
 ## エラー処理
 
