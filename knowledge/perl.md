@@ -14,8 +14,13 @@ Perlでのコーディングにおけるプラクティス
 ## 環境
 
 - miseでインストールしたperlを利用する。システムのperlを絶対に利用しない
-- 作業ディレクトリに「perl 5.40.0」と書いたmise.tomlファイルを作成する
 - `eval "$(mise activate bash)" && perl -v` のようにmise activateを行ってからスクリプトを実行する
+- mise.toml には次が記載されていることを確認する
+
+    ```toml
+    [tools]
+    perl = "5.40.0"
+    ```
 
 ## コーディングスタイル
 
@@ -102,9 +107,9 @@ sub add($x, $y) {
 ## テスト
 
 - ユニットテストは、`Test2::V0` を利用する
-- da
-- `subtest 'DESCRIPTION' => sub { ... }` の `DESCRIPTION` には、"前提となる状況"、"実行する操作"、"期待する結果"を書く
-    - 例: 
+- `subtest` でテストをグループ化する
+    - 1つ目は、`subtest '関数名'` として、テスト対象の関数名を書く
+    - 2つ目は、`subtest 'どんな時に、何を期待するか'` を書く
 - テーブルテストを書く際は、次のコードのようにMultiple-alias syntax for foreach を利用する
   - `while (my ($x, $y, $expected) = splice(@cases, 0, 3)) { ... }` は*使わない*
 
@@ -311,5 +316,11 @@ sub add($x, $y) {
 ## 依存モジュールの管理
 
 - `cpanfile` で依存モジュールを管理し、バージョンを指定する
+  - 記載するモジュール名は、依存しているモジュールの名前を記載し、配布名は記載しない
 - `Carmel` でインストールをする
+
+```perl
+# Example of cpanfile
+requires 'Types:Standard', '== 2.006000';
+```
 
