@@ -15,8 +15,8 @@
 
 `filesystem` または `fetch` を利用して、次の内容を理解して、作業を開始してください。
 
-* 開発者の役割について https://github.com/kfly8/myai/blob/main/roles/developer.md
-* Perlについて https://github.com/kfly8/myai/blob/main/knowledges/perl.md
+* 開発者の役割について https://github.com/kfly8/myai/blob/main/role/developer.md
+* Perlについて https://github.com/kfly8/myai/blob/main/knowledge/perl.md
 
 ---
 
