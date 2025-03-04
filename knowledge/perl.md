@@ -6,8 +6,7 @@ Perlでのコーディングにおけるプラクティス
 
 - 最新のモダンPerlを利用する
 - 値の型制約を宣言する
-- パッケージに、NAME,SYNOPSIS,DESCRIPTIONを記載する
-- 関数の冒頭に、その関数が何をするかをコメントする
+- 理解を助けるコメントを書く
 - アダプタパターンで副作用を抽象化する
 - 純粋関数を優先する
 - 例外よりもエラーを返す
@@ -49,6 +48,52 @@ sub add {
 1;
 ```
 
+## コメント
+
+- POD形式で、NAME,SYNOPSIS,DESCRIPTIONを記載する
+- encoding utf8を記載する
+- 関数の冒頭に、その関数が何をするかをコメントする
+- *していないこと* に注意が必要な場合は、していない理由もコメントする
+
+```perl
+package MyModule;
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+MyModule - This is a sample module
+
+=head1 SYNOPSIS
+
+    use MyModule qw(add);
+    add(1, 2); # => 3
+
+=head1 DESCRIPTION
+
+This is a sample module
+
+=head1 FUNCTIONS
+
+=cut
+
+use v5.40;
+
+=pod
+
+=head2 add($x, $y)
+
+Add two numbers. 
+
+=cut
+
+sub add($x, $y) {
+    return $x + $y;
+}
+```
+
 ## テスト
 
 - ユニットテストは、`Test2::V0` を利用する
@@ -58,6 +103,7 @@ sub add {
 
 ```perl
 use v5.40;
+use utf8;
 use Test2::V0;
 
 subtest 'add' => sub {
@@ -76,7 +122,7 @@ subtest 'add' => sub {
 done_testing;
 ```
 
-- テストのmatcherは、`is` を利用する
+- `is` を利用する
 - `like`, `unlike` は用いない。代わりに`match` を利用する
 
 ```perl
