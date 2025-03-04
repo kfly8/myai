@@ -51,9 +51,14 @@ sub add {
 ## コメント
 
 - POD形式で、NAME,SYNOPSIS,DESCRIPTIONを記載する
+   - AUTHORS, LICENSE はユーザーが記載するため不要
 - encoding utf8を記載する
 - 関数の冒頭に、その関数が何をするかをコメントする
 - *していないこと* に注意が必要な場合は、していない理由もコメントする
+- 関数の仕様をより簡潔で読みやすい形式に書く
+    - 機能説明、使用例、パラメータ説明、戻り値、アルゴリズム（任意）の順に記述
+    - 例: find_primes($limit) -> Result(PrimeList, InvalidInputError)
+    - `@params` や `@return` などのタグを使用する
 
 ```perl
 package MyModule;
@@ -97,7 +102,9 @@ sub add($x, $y) {
 ## テスト
 
 - ユニットテストは、`Test2::V0` を利用する
+- da
 - `subtest 'DESCRIPTION' => sub { ... }` の `DESCRIPTION` には、"前提となる状況"、"実行する操作"、"期待する結果"を書く
+    - 例: 
 - テーブルテストを書く際は、次のコードのようにMultiple-alias syntax for foreach を利用する
   - `while (my ($x, $y, $expected) = splice(@cases, 0, 3)) { ... }` は*使わない*
 
@@ -107,22 +114,41 @@ use utf8;
 use Test2::V0;
 
 subtest 'add' => sub {
-    my @cases = (
-        # x, y => expected
-        1, 2 => 3
-        2, 3 => 5
-        3, 4 => 7
-    );
+    subtest '2つの数値を与えた時、その和を返す' => sub {
+        my @cases = (
+            # x, y => expected
+            1, 2 => 3
+            2, 3 => 5
+            3, 4 => 7
+        );
 
-    for my ($x, $y, $expected) (@cases) {
-        is add($x, $y), $expected, "add $x and $y";
-    }
+        for my ($x, $y, $expected) (@cases) {
+            my ($got, $err) = add($x, $y);
+            is $got, $expected, "add $x and $y";
+            is $err, undef, "no error";
+        }
+    };
+
+    subtest '数値以外を与えた時、InvalidInputErrorを返す' => sub {
+        my @cases = (
+            # x, y
+            'a', 2
+            2, 'b'
+            'a', 'b'
+        );
+
+        for my ($x, $y) (@cases) {
+            my ($got, $err) = add($x, $y);
+            is $got, undef, "no result";
+            is $err, 'InvalidInputError', "$x, $y is invalid";
+        }
+    };
 };
 
 done_testing;
 ```
 
-- `is` を利用する
+- `is` を利用する。ユーザーはmatcherに注力するため。
 - `like`, `unlike` は用いない。代わりに`match` を利用する
 
 ```perl
@@ -193,7 +219,7 @@ sub add($x, $y) {
 }
 ```
 
-## エラー処理
+## エラーハンドリング
 
 1. 想定しているエラーは、エラーメッセージを持つエラークラスを継承した子クラスをエラーケースごとに用意する
 
