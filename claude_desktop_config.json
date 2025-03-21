@@ -1,12 +1,9 @@
 {
   "mcpServers": {
-	"fetch": {
-	  "command": "uvx",
-	  "args": ["mcp-server-fetch"]
-	},
-	"mcp-server-commands": {
-	  "command": "npx",
-	  "args": [ "mcp-server-commands"]
+	"claude_code": {
+		"command": "claude",
+		"args": ["mcp", "serve"],
+		"env": {}
 	}
   }
 }
