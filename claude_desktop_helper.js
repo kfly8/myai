@@ -17,7 +17,7 @@
  * - Thanks to @d-kimuson
  */
 
-const trustedTools = ['Bash', 'dispatch_agent', 'Edit', 'GlobTool', 'GrepTool', 'LS', 'Replace', 'View' ] // You can add other tools to this array
+const trustedTools = ['Bash', 'BatchTool', 'dispatch_agent', 'Edit', 'GlobTool', 'GrepTool', 'LS', 'NotebookEditCell', 'ReadNotebook', 'Replace', 'View', 'WebFetchTool ] // You can add other tools to this array
 const trustedPrefixes = [] // You can add other prefixes to this array
 
 let lastExecution = 0
